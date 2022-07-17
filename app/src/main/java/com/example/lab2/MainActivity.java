@@ -12,15 +12,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "MyActivity";
     String[] labels;
-
+    TextView yourNumberTextView;
+    SeekBar seekbar;
     interface GameSetup {
         void game();
     }
@@ -51,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         Resources res = getResources();
         labels = res.getStringArray(R.array.options);
+        yourNumberTextView = findViewById(R.id.textView3);
+        seekbar = findViewById(R.id.seekBar4);
+
     }
 
     private void initSpinner(){
@@ -69,28 +73,35 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         spinner.setOnItemSelectedListener(this);
     }
+    private void displayYourNumber(){
+        int yourNumber = seekbar.getProgress();
+        String text = getString(R.string.your_number) + " "+ yourNumber;
+        yourNumberTextView.setText(text);
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setSeekbarRange(int min, int max){
+        seekbar.setMin(min);
+        seekbar.setMax(max);
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void game1to100(){
-        SeekBar seekbar = findViewById(R.id.seekBar4);
         Log.i(TAG, "Starting 1 to 100 Setup...");
-        seekbar.setMin(1);
-        seekbar.setMax(100);
+        setSeekbarRange(1,100);
+        displayYourNumber();
     }
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void game1to10(){
-        SeekBar seekbar = findViewById(R.id.seekBar4);
         Log.i(TAG, "Starting 1 to 10 Setup...");
-        seekbar.setMin(1);
-        seekbar.setMax(10);
+        setSeekbarRange(1,10);
+        displayYourNumber();
     }
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void gameHeadsOrTails(){
-        SeekBar seekbar = findViewById(R.id.seekBar4);
         Log.i(TAG, "Starting Heads or Tails Setup...");
-        seekbar.setMin(0);
-        seekbar.setMin(1);
+        setSeekbarRange(0,1);
+        displayYourNumber();
     }
 
 

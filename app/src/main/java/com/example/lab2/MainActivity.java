@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Random;
 
@@ -29,12 +31,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Button guessButton;
     int selectedGame;
     int yourNumber = 0;
+    int yourScore = 0;
+    int myScore = 0;
 
     GameSettings[] gameSettings = {new GameSettings(0,1), new GameSettings(1,10), new GameSettings(1,100)};
 
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,15 +81,42 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @RequiresApi(api = Build.VERSION_CODES.N)
     public int getRandomNumber(int min, int max) {
         Random random = new Random();
+        //noinspection OptionalGetWithoutIsPresent
         return random.ints(min, max+1)
                 .findFirst()
                 .getAsInt();
     }
+    @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void clickedGuessButton(View view){
         Log.i(TAG, "Guess Rendered");
         int myNumber = getRandomNumber(gameSettings[selectedGame].min,gameSettings[selectedGame].max);
         myNumberTextView.setText(getString(R.string.my_number)+" "+myNumber);
+        if (myNumber == yourNumber){
+            yourScore++;
+            Log.i(TAG,"Player wins!");
+        } else {
+            myScore++;
+            Log.i(TAG, "I win!");
+        }
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+        if (yourScore>myScore) {
+            String text = "Player winning: " + yourScore + " - " + myScore;
+            Log.i(TAG, text);
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        } else if (yourScore<myScore){
+            String text = "I am winning: " + yourScore + " - " + myScore;
+            Log.i(TAG,text );
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        } else {
+            String text = "tie game: " + yourScore + " - " + myScore;
+            Log.i(TAG, text);
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
     }
     private void initSpinner(){
         Spinner spinner = findViewById(R.id.gamesSelectionSpinner);

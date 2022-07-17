@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -22,20 +23,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String[] labels;
     TextView yourNumberTextView;
     SeekBar seekbar;
-    interface GameSetup {
-        void game();
-    }
-    private GameSetup[] gameSetups = new GameSetup[] {
-            new GameSetup() {
-                @RequiresApi(api = Build.VERSION_CODES.O)
-                public void game() {gameHeadsOrTails();}},
-            new GameSetup() {
-                @RequiresApi(api = Build.VERSION_CODES.O)
-                public void game() {game1to10();}},
-            new GameSetup() {
-                @RequiresApi(api = Build.VERSION_CODES.O)
-                public void game() {game1to100();}},
-    };
+    Button guessButton;
+    int selectedGame;
+    int yourNumber = 0;
+
+    GameSettings[] gameSettings = {new GameSettings(0,1), new GameSettings(1,10), new GameSettings(1,100)};
+
+
 
 
     @Override
@@ -54,9 +48,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         labels = res.getStringArray(R.array.options);
         yourNumberTextView = findViewById(R.id.textView3);
         seekbar = findViewById(R.id.seekBar4);
+        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                yourNumber = progress;
+                yourNumberTextView.setText(getText(R.string.your_number)+" "+yourNumber);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+        guessButton = findViewById(R.id.button2);
+        guessButton.setOnClickListener(this::clickedGuessButton);
+
+
 
     }
-
+    public void clickedGuessButton(View view){
+        int i = 0;
+    }
     private void initSpinner(){
         Spinner spinner = findViewById(R.id.gamesSelectionSpinner);
         try{
@@ -74,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinner.setOnItemSelectedListener(this);
     }
     private void displayYourNumber(){
-        int yourNumber = seekbar.getProgress();
+        yourNumber = seekbar.getProgress();
         String text = getString(R.string.your_number) + " "+ yourNumber;
         yourNumberTextView.setText(text);
     }
@@ -86,25 +100,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void game1to100(){
-        Log.i(TAG, "Starting 1 to 100 Setup...");
-        setSeekbarRange(1,100);
-        displayYourNumber();
-    }
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void game1to10(){
-        Log.i(TAG, "Starting 1 to 10 Setup...");
-        setSeekbarRange(1,10);
-        displayYourNumber();
-    }
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void gameHeadsOrTails(){
-        Log.i(TAG, "Starting Heads or Tails Setup...");
-        setSeekbarRange(0,1);
+    private void setupGame(){
+        if (selectedGame == 0){
+            Log.i(TAG, "Starting Heads or Tails Setup...");
+        }else{
+            Log.i(TAG, "Starting " + gameSettings[selectedGame].min + " to "+gameSettings[selectedGame].max+ " Setup...");
+        }
+        setSeekbarRange(gameSettings[selectedGame].min,gameSettings[selectedGame].max);
         displayYourNumber();
     }
 
 
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
         String selection = (String) parent.getItemAtPosition(position);
@@ -113,7 +121,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         int i;
         for (i=0; i<labels.length; i++) {
             if (selection.equals(labels[i])){
-                gameSetups[i].game();
+                selectedGame = i;
+                setupGame();
             }
         }
     }
@@ -125,4 +134,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 }
 
+class GameSettings {
+
+    int min;
+    int max;
+    GameSettings(int min, int max){
+        this.min = min;
+        this.max = max;
+    }
+}
 

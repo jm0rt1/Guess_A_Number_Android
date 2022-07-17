@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Lab2</string>
+    <string name="my_number">My Number:</string>
+    <string name="guess_a_number_between">Guess A Number Between...</string>
+    <string name="your_number">Your Number:</string>
+    <string name="guess">Guess</string>
+
+    <string-array name="options">
+        <item>Heads Or Tails</item>
+        <item>1 to 10</item>
+        <item>1 to 100</item>
+    </string-array>
+</resources>

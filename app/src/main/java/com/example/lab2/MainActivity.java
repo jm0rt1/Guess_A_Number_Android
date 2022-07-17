@@ -16,12 +16,15 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.Random;
+
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "MyActivity";
     String[] labels;
     TextView yourNumberTextView;
+    TextView myNumberTextView;
     SeekBar seekbar;
     Button guessButton;
     int selectedGame;
@@ -65,12 +68,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
         guessButton = findViewById(R.id.button2);
         guessButton.setOnClickListener(this::clickedGuessButton);
+        myNumberTextView = findViewById(R.id.textView5);
 
 
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public int getRandomNumber(int min, int max) {
+        Random random = new Random();
+        return random.ints(min, max+1)
+                .findFirst()
+                .getAsInt();
+    }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void clickedGuessButton(View view){
-        int i = 0;
+        Log.i(TAG, "Guess Rendered");
+        int myNumber = getRandomNumber(gameSettings[selectedGame].min,gameSettings[selectedGame].max);
+        myNumberTextView.setText(getString(R.string.my_number)+" "+myNumber);
     }
     private void initSpinner(){
         Spinner spinner = findViewById(R.id.gamesSelectionSpinner);

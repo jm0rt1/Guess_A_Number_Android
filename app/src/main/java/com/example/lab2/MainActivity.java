@@ -2,6 +2,8 @@ package com.example.lab2;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.view.GestureDetectorCompat;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,6 +11,9 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -33,10 +38,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     int yourNumber = 0;
     int yourScore = 0;
     int myScore = 0;
+    boolean pinching = false;
 
     GameSettings[] gameSettings = {new GameSettings(0,1), new GameSettings(1,10), new GameSettings(1,100)};
-
-
+    ScaleGestureDetector mDetector;
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -74,10 +79,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         guessButton = findViewById(R.id.button2);
         guessButton.setOnClickListener(this::clickedGuessButton);
         myNumberTextView = findViewById(R.id.textView5);
-
+        mDetector = new ScaleGestureDetector(this, new Lab2GestureListener());
 
 
     }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        mDetector.onTouchEvent(event);
+        return true;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public int getRandomNumber(int min, int max) {
         Random random = new Random();
@@ -176,6 +188,40 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onNothingSelected(AdapterView <?> parent){
         // sometimes you need nothing here
+    }
+
+    class Lab2GestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        private static final String DEBUG_TAG = "Gestures";
+        @Override
+        public boolean onScale (ScaleGestureDetector detector) {
+            Log.i(TAG,"double tap: " + detector.toString());
+            float scaleFactor = detector.getScaleFactor();
+            if (scaleFactor < 1) {
+                // pinching
+                if (pinching == false) {
+                    pinching = true;
+                    myScore = 0;
+                    yourScore = 0;
+
+                    Context context = getApplicationContext();
+                    int duration = Toast.LENGTH_SHORT;
+                    String text = "Score reset: " + yourScore + " - " + myScore;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                }
+            }
+
+            return true;
+        }
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
+            return true;
+        }
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            pinching = false;
+        }
     }
 
 }
